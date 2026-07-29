@@ -3,7 +3,8 @@
 | Signal / Domain | Route to |
 |-----------------|----------|
 | Architecture, stack choice, scope, code review, cross-cutting decisions | Niobe |
-| UI, layout, styling, casting animation, reading view, accessibility markup | Trinity |
+| Visual design, aesthetics, palette, typography, motion design, the look of the yao lines | Mouse |
+| UI behaviour, DOM wiring, event handling, accessibility markup | Trinity |
 | Randomness, CSPRNG, coin-roll math, hexagram/trigram derivation, changing lines, transformed hexagram | Switch |
 | Hexagram corpus (64 hexagrams, names, judgments, images, line texts), interpretation copy, README/docs | Seraph |
 | Tests, randomness distribution checks, edge cases, a11y audits, regression checks | Tank |

@@ -11,12 +11,13 @@
 - The user can then request an interpretation/reading of the primary hexagram, the changing lines, and the resulting hexagram.
 
 **Constraints:**
-- Completely **stateless** — no server-side session, no database, no user accounts, no persistence of readings.
+- **No backend** — no server-side session, no database, no user accounts, no network requests of any kind.
+- Cast history is persisted **device-locally** in `localStorage` only (superseded the original stateless requirement — see `decisions.md`). The user's question is never stored or transmitted.
 - Randomness quality is a first-class requirement, not an afterthought.
 
 **Stack:** TBD by the Lead (default lean: static site, TypeScript, no backend required).
 
-**Project owner:** Mor Shemesh
+**Project owner:** the repository owner
 
 ## Members
 
@@ -24,6 +25,7 @@
 |------|------|---------|-------|
 | Niobe | Lead | .squad/agents/niobe/charter.md | 🏗️ Lead |
 | Trinity | Frontend Dev | .squad/agents/trinity/charter.md | ⚛️ Frontend |
+| Mouse | Design Lead | .squad/agents/mouse/charter.md | 🎨 Design |
 | Switch | Engine Dev | .squad/agents/switch/charter.md | 🔧 Backend |
 | Seraph | Content & Data | .squad/agents/seraph/charter.md | 📝 Docs |
 | Tank | Tester | .squad/agents/tank/charter.md | 🧪 Test |

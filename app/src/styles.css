@@ -1,0 +1,1072 @@
+/* ===================================================================
+   I Ching Oracle — src/styles.css
+   Visual system: "The Violet Veil." DARK ONLY (owner's decision).
+   A desaturated near-black field lit by two soft violet radials, a
+   whisper of grain, hairline rules that fade in and out, and one
+   luminous colour — violet — spent in exactly one place: what is
+   changing. The six strokes ARE the design; ink never blurs.
+
+   Author: Mouse (Design Lead). Hand-written CSS, authored inline SVG.
+   No framework (tokens translated from the supplied Tailwind reference),
+   no icon library, no network assets, no storage. Fonts self-hosted
+   via src/fonts.css (Cormorant Garamond / Karla / Noto Serif SC).
+
+   WCAG AA contrast — MEASURED (OKLCH→sRGB→WCAG) against the dark
+   field, background oklch(0.11 0.008 300):
+     foreground        oklch(0.92)   16.1:1  (AAA)  body / normal lines
+     muted-foreground  oklch(0.68)    7.1:1  (AA)   captions / eyebrows
+     primary  violet   oklch(0.66)    6.1:1  (AA)   CHANGING lines / seal
+     ash              oklch(0.72)    8.2:1  (AA)   calm strokes (graphic)
+     ring     violet   oklch(0.72)    7.8:1  (AA)   focus ring
+   Changing lines also carry a non-colour signal (the seal shape + the
+   accessible name), so hue is never the sole channel.
+   =================================================================== */
+
+/* Self-hosted typefaces (Switch's file). Must precede all rules. Relative
+   path → Vite bundles the woff2 into dist/assets. Zero network requests. */
+@import "./fonts.css";
+
+/* ── Hidden guard — MUST win over any author `display` (DEFECT 2) ─────
+   The UA rule `[hidden]{display:none}` is a type selector and loses to
+   author class rules like `.cast-actions{display:flex}`. This !important
+   guard restores correct behaviour: anything with the `hidden` property
+   is removed from layout, the a11y tree, and tab order — everywhere. */
+[hidden] { display: none !important; }
+
+/* ── Custom properties ─────────────────────────────────────────────── */
+
+:root {
+  color-scheme: dark;
+
+  /* ── Owner's dark-violet design system (OKLCH). Dark-only, by decision. ──
+     Tokens taken from the supplied Tailwind reference; translated to plain
+     custom properties. No framework, no @theme. */
+  --ink:              oklch(0.11 0.008 300);
+  --background:       oklch(0.11 0.008 300);
+  --foreground:       oklch(0.92 0.005 300);
+  --card:             oklch(0.145 0.01 300);
+  --primary:          oklch(0.66 0.18 300);   /* luminous violet */
+  --secondary:        oklch(0.2 0.012 300);
+  --muted:            oklch(0.18 0.01 300);
+  --muted-foreground: oklch(0.68 0.014 300);  /* raised from 0.62 to clear AA on the field */
+  --accent:           oklch(0.5 0.16 300);
+  --destructive:      oklch(0.55 0.19 20);
+  --border:           oklch(0.26 0.012 300);
+  --input:            oklch(0.24 0.012 300);
+  --ring:             oklch(0.72 0.17 300);    /* raised from 0.66 for a clearer focus ring */
+  --violet:           oklch(0.66 0.18 300);
+  --violet-deep:      oklch(0.42 0.15 300);
+  --ash:              oklch(0.72 0.008 300);
+
+  /* Semantic aliases — kept so the rest of the sheet stays terse and the
+     violet system flows everywhere the old ink/paper vars were used. */
+  --clr-bg:      var(--background);
+  --clr-surface: var(--card);
+  --clr-text:    var(--foreground);
+  --clr-muted:   var(--muted-foreground);
+  --clr-accent:  var(--primary);   /* "what is changing" — now luminous violet */
+  --clr-accent-lit: oklch(0.8 0.15 300);  /* changing ink: brighter than the ash
+                                             normals so it reads lit — and, being
+                                             lighter than --clr-line, stays distinct
+                                             in greyscale (with weight, below) */
+  --clr-line:    var(--ash);       /* normal strokes: calm, near-neutral ink */
+  --clr-border:  var(--border);
+  --clr-focus:   var(--ring);
+
+  /* Type — self-hosted via src/fonts.css (Switch vendors the woff2 + @font-face).
+     System stacks remain as fallbacks until that file lands. No CDN, ever. */
+  --font-display: 'Cormorant Garamond', 'Palatino Linotype', Palatino, 'Book Antiqua', Georgia, 'Times New Roman', serif;
+  --font-body:    'Karla', system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Helvetica Neue', Arial, sans-serif;
+  --font-cjk:     'Noto Serif SC', 'Iowan Old Style', 'Palatino Linotype', Palatino, Georgia, serif;
+  --font-serif:   var(--font-display);   /* legacy alias */
+  --font-sans:    var(--font-body);      /* legacy alias */
+
+  /* Spacing scale */
+  --sp-xs:  0.25rem;
+  --sp-sm:  0.5rem;
+  --sp-md:  1rem;
+  --sp-lg:  1.5rem;
+  --sp-xl:  2.5rem;
+  --sp-2xl: 4rem;
+  --sp-3xl: 6rem;
+
+  /* Hero hexagram geometry (whole pixels — crisp at rest) */
+  --hero-bar-h:  36px;   /* stroke thickness — commanding */
+  --hero-bar-h-changing: 46px;  /* a changing line is inked heavier — a denser
+                                   mark that reads as changing in greyscale, no
+                                   badge; fits the 48px slot with hairline margin */
+  --hero-gap:    32px;   /* gap inside a broken (yin) stroke */
+  --slot-h:      48px;   /* fixed row height per line — no layout shift */
+  --slot-gap:    30px;   /* vertical gap between the six lines */
+  --hero-width:  620px;  /* the hexagram's commanding width */
+
+  /* Mini hexagram (reading view) */
+  --mini-bar-h:  8px;
+  --mini-bar-h-changing: 12px;   /* heavier changing stroke, mini scale */
+  --mini-gap:    10px;
+  --mini-slot-h: 18px;
+  --mini-slot-gap: 11px;
+
+  /* A hairline that fades in and out rather than a hard border. */
+  --hairline: linear-gradient(90deg, transparent, color-mix(in oklab, var(--violet) 45%, transparent), transparent);
+  /* A restrained violet glow — used sparingly, never behind the strokes. */
+  --glow-violet: 0 40px 90px -50px color-mix(in oklab, var(--violet) 55%, transparent);
+
+  --measure: 65ch;       /* body reading measure */
+  --radius:  0.125rem;   /* nearly square — keep it sharp */
+}
+
+/* ── Reset ─────────────────────────────────────────────────────────── */
+
+*, *::before, *::after {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+html { font-size: 16px; -webkit-text-size-adjust: 100%; }
+
+body {
+  background-color: var(--background);
+  /* The veil — two soft violet radials, fixed so they sit still as the page
+     scrolls, like light behind fog. */
+  background-image:
+    radial-gradient(120% 80% at 15% -10%, color-mix(in oklab, var(--violet) 14%, transparent), transparent 60%),
+    radial-gradient(90% 70% at 100% 110%, color-mix(in oklab, var(--violet-deep) 16%, transparent), transparent 65%);
+  background-attachment: fixed;
+  background-repeat: no-repeat;
+  color: var(--foreground);
+  font-family: var(--font-body);
+  line-height: 1.65;
+  min-height: 100dvh;
+  padding: var(--sp-3xl) var(--sp-lg) var(--sp-2xl);
+  -webkit-font-smoothing: antialiased;
+}
+
+/* Grain — an inline fractal-noise overlay, base64-encoded so it is a fully
+   self-contained data URI (NOT a network request; the http URL inside is only
+   the SVG XML namespace). Full-bleed, non-interactive, whisper-quiet. */
+body::after {
+  content: '';
+  position: fixed;
+  inset: 0;
+  z-index: 2147483000;
+  pointer-events: none;
+  opacity: 0.035;
+  background-image: url("data:image/svg+xml;base64,PHN2ZyB4bWxucz0naHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmcnIHdpZHRoPScxNDAnIGhlaWdodD0nMTQwJz48ZmlsdGVyIGlkPSduJz48ZmVUdXJidWxlbmNlIHR5cGU9J2ZyYWN0YWxOb2lzZScgYmFzZUZyZXF1ZW5jeT0nMC44MicgbnVtT2N0YXZlcz0nMicgc3RpdGNoVGlsZXM9J3N0aXRjaCcvPjwvZmlsdGVyPjxyZWN0IHdpZHRoPScxMDAlJyBoZWlnaHQ9JzEwMCUnIGZpbHRlcj0ndXJsKCNuKScvPjwvc3ZnPg==");
+}
+
+::selection {
+  background: color-mix(in oklab, var(--violet) 40%, transparent);
+  color: var(--foreground);
+}
+
+#app {
+  position: relative;
+  max-width: 1120px;
+  margin: 0 auto;
+  overflow-x: clip;   /* contains the bleeding display type at the page edge */
+}
+
+/* ── Accessibility ─────────────────────────────────────────────────── */
+
+.sr-only {
+  position: absolute;
+  width: 1px; height: 1px;
+  padding: 0; margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
+}
+
+:focus-visible {
+  outline: 2px solid var(--clr-focus);
+  outline-offset: 4px;
+  border-radius: var(--radius);
+}
+
+/* ── Typography ────────────────────────────────────────────────────── */
+
+h1 {
+  font-family: var(--font-display);
+  font-size: clamp(2.6rem, 9vw, 4.75rem);
+  font-weight: 300;
+  line-height: 0.98;
+  letter-spacing: -0.01em;
+  color: var(--clr-text);
+  margin-bottom: var(--sp-sm);
+}
+
+/* Eyebrow labels — small caps, wide tracking, muted. The section voice. */
+h2 {
+  font-family: var(--font-body);
+  font-size: 0.65rem;
+  font-weight: 600;
+  color: var(--clr-muted);
+  margin: var(--sp-xl) 0 var(--sp-lg);
+  text-transform: uppercase;
+  letter-spacing: 0.32em;
+}
+
+h3 {
+  font-family: var(--font-body);
+  font-size: 0.65rem;
+  font-weight: 600;
+  color: var(--clr-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.28em;
+  margin: var(--sp-lg) 0 var(--sp-sm);
+}
+
+p { margin-bottom: var(--sp-md); }
+
+/* ── Buttons ───────────────────────────────────────────────────────── */
+
+.btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0.8rem 2.1rem;
+  font-family: var(--font-sans);
+  font-size: 0.8125rem;
+  font-weight: 600;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  cursor: pointer;
+  border-radius: var(--radius);
+  border: 1px solid transparent;
+  transition: background-color 0.18s ease, border-color 0.18s ease,
+              color 0.18s ease, opacity 0.18s ease, transform 0.18s ease;
+  min-width: 11.5rem;
+  line-height: 1.4;
+}
+
+.btn:active:not(:disabled) { transform: translateY(1px); }
+
+.btn:disabled {
+  opacity: 0.35;
+  cursor: not-allowed;
+  pointer-events: none;
+}
+
+.btn--primary {
+  background-color: var(--primary);
+  color: var(--ink);
+  border-color: color-mix(in oklab, var(--primary) 80%, white 20%);
+  box-shadow: var(--glow-violet);
+}
+.btn--primary:hover:not(:disabled) {
+  background-color: color-mix(in oklab, var(--primary) 88%, white 12%);
+}
+
+.btn--secondary {
+  background-color: color-mix(in oklab, var(--card) 60%, transparent);
+  color: var(--foreground);
+  border-color: color-mix(in oklab, var(--violet) 22%, transparent);
+  backdrop-filter: blur(10px);
+}
+.btn--secondary:hover:not(:disabled) {
+  color: var(--foreground);
+  border-color: color-mix(in oklab, var(--violet) 45%, transparent);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .btn { transition: none; }
+  .btn:active:not(:disabled) { transform: none; }
+}
+
+/* ── Casting page ──────────────────────────────────────────────────── */
+
+.casting-page {
+  position: relative;
+  isolation: isolate;
+}
+
+/* Desktop: an asymmetric two-column composition. Voice + controls sit in a
+   quiet left rail; the hexagram commands the wide right stage. This fills the
+   canvas deliberately (no dead third) and keeps the masthead present after a
+   cast, since the strokes land BESIDE the title, not below it. The stage spans
+   both rows so it centres vertically against the lede + actions. */
+@media (min-width: 900px) {
+  .casting-page {
+    display: grid;
+    grid-template-columns: minmax(300px, 360px) 1fr;
+    grid-template-rows: auto auto auto;
+    grid-template-areas:
+      "lede    stage"
+      "actions stage"
+      "history .    ";
+    column-gap: clamp(3rem, 6vw, 6.5rem);
+    align-items: center;
+    min-height: min(76vh, 680px);
+  }
+  .casting-lede   { grid-area: lede; align-self: center; }
+  .casting-stage  { grid-area: stage; align-self: start; }
+  .cast-actions   { grid-area: actions; align-self: start; }
+  .casting-history { grid-area: history; align-self: start; }
+}
+
+.casting-stage {
+  position: relative;
+  isolation: isolate;
+}
+
+/* Elemental watermark: a giant, faint 易 ("change") set as art behind the
+   stage — the strokes are laid over it. Decorative CSS content only, never
+   corpus or user text. It anchors the right stage before the first cast. */
+.casting-stage::before {
+  content: '易';
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -52%);
+  z-index: -1;
+  font-family: var(--font-cjk);
+  font-size: clamp(11rem, 30vw, 22rem);
+  line-height: 1;
+  color: color-mix(in oklab, var(--violet) 60%, var(--foreground));
+  opacity: 0.08;
+  pointer-events: none;
+  user-select: none;
+}
+
+.casting-lede h1 { max-width: 12ch; }
+
+.tagline {
+  color: var(--clr-muted);
+  font-size: 1rem;
+  letter-spacing: 0.02em;
+  max-width: 46ch;
+  margin-bottom: var(--sp-lg);
+}
+
+/* Framing epigraph — set typography, not a compliance sticker. The stance
+   ("reflection, not prediction") is met before the first cast. */
+.framing {
+  font-family: var(--font-display);
+  font-style: italic;
+  font-size: 1.0625rem;
+  color: var(--clr-text);
+  max-width: 42ch;
+  padding-top: var(--sp-md);
+  border-top: 1px solid transparent;
+  border-image-source: var(--hairline);
+  border-image-slice: 1;
+  margin-bottom: var(--sp-2xl);
+}
+
+/* ── Question area ─────────────────────────────────────────────────── */
+
+.question-area {
+  margin-bottom: var(--sp-2xl);
+  max-width: var(--measure);
+}
+
+.question-area label {
+  display: block;
+  font-size: 0.75rem;
+  font-weight: 600;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: var(--clr-muted);
+  margin-bottom: var(--sp-xs);
+}
+
+.privacy-note {
+  font-size: 0.75rem;
+  color: var(--clr-muted);
+  font-style: italic;
+  margin-bottom: var(--sp-sm);
+}
+
+#question-input {
+  width: 100%;
+  padding: 0.6rem 0;
+  background-color: transparent;
+  color: var(--clr-text);
+  border: 0;
+  border-bottom: 1px solid var(--border);
+  font-family: var(--font-display);
+  font-size: 1.15rem;
+  line-height: 1.6;
+  resize: none;
+  overflow: hidden;
+}
+#question-input:focus {
+  outline: none;
+  border-bottom-color: var(--ring);
+  box-shadow: 0 1px 0 0 var(--ring);
+}
+#question-input::placeholder {
+  color: var(--clr-muted);
+  opacity: 0.6;
+  font-style: italic;
+}
+
+/* ── Hexagram display — six fixed slots, no layout shift ────────────── */
+
+.hexagram-display {
+  display: flex;
+  flex-direction: column;
+  gap: var(--slot-gap);
+  width: 100%;
+  max-width: var(--hero-width);
+  margin: 0;
+}
+
+/* Single-column (mobile / narrow): the stage sits under the lede and needs
+   breathing room above and below. */
+@media (max-width: 899px) {
+  .hexagram-display { margin: var(--sp-2xl) 0 0; }
+}
+
+.line-slot {
+  height: var(--slot-h);
+  display: flex;
+  align-items: center;
+  position: relative;
+}
+
+/* An uncast slot renders NOTHING — the pre-cast stage is the 易 watermark
+   alone, empty and waiting. The slot still holds its fixed height (above), so
+   the full six-line stage is reserved up front and no stroke arrival, nor the
+   watermark, ever shifts. Each line lands into space that was genuinely empty. */
+
+/* ── Line row ──────────────────────────────────────────────────────── */
+
+.line-row {
+  display: flex;
+  align-items: center;
+  width: 100%;
+  height: 100%;
+}
+
+/* ── Yao stroke — the hero, drawn as crisp inline SVG ──────────────── */
+
+.yao {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  flex: 1;
+  min-width: 0;
+}
+
+.yao__bar {
+  display: flex;
+  align-items: center;
+  flex: 1;
+  min-width: 0;
+}
+
+/* The ink itself: a solid vector fill with hard edges. No gradient, no
+   blur, no glow. Vector geometry stays sharp at any size / DPI. */
+.yao__ink {
+  display: block;
+  width: 100%;
+  height: 100%;
+}
+.yao__ink path {
+  fill: var(--clr-line);
+  stroke: none;
+}
+
+/* Yang = one unbroken stroke. Yin = two strokes with a clean gap. */
+.yao--yang .yao__bar > .yao__ink { flex: 1; }
+
+.yao__half {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  align-items: center;
+}
+.yao__half > .yao__ink { width: 100%; }
+
+.yao--hero .yao__bar { height: var(--hero-bar-h); gap: var(--hero-gap); }
+.yao--hero .yao__ink { height: var(--hero-bar-h); }
+
+/* Changing line — the single most consequential fact in a reading. The mark
+   ITSELF is different: it is inked HEAVIER (a taller, denser brushstroke) and
+   LIT (brighter luminous violet + a drop-shadow halo around the vector). Because
+   the distinction is weight + luminosity, not hue, a changing line is still
+   identifiable with the colour channel removed — no badge, nothing beside the
+   ink. The glow haloes the shape; the fill edge stays perfectly hard, never
+   blurs. Applies to yang (one stroke) and yin (both halves) alike. */
+.yao--changing .yao__ink path { fill: var(--clr-accent-lit); }
+
+.yao--hero.yao--changing .yao__bar,
+.yao--hero.yao--changing .yao__ink { height: var(--hero-bar-h-changing); }
+.yao--hero.yao--changing .yao__ink {
+  filter: drop-shadow(0 0 10px color-mix(in oklab, var(--violet) 66%, transparent));
+}
+
+.yao--mini.yao--changing .yao__bar,
+.yao--mini.yao--changing .yao__ink { height: var(--mini-bar-h-changing); }
+.yao--mini.yao--changing .yao__ink {
+  filter: drop-shadow(0 0 5px color-mix(in oklab, var(--violet) 58%, transparent));
+}
+
+/* Reveal as CEREMONY, not feedback: the ink is LAID DOWN — wiped into
+   existence left-to-right via clip-path — so each stroke reads as a brush
+   pressed and drawn, not a bar sliding in. Deceleration-dominant easing:
+   fast press, long slow settle. Every line ends fully unclipped (crisp).
+   The per-line start is driven by --reveal-delay (set in JS) so the six
+   arrive as a staggered cascade from the ground up. */
+.line-row .yao__bar {
+  animation: ink-lay 900ms
+             cubic-bezier(0.22, 1, 0.36, 1)
+             calc(var(--reveal-delay, 0ms) + 130ms) both;
+}
+
+@keyframes ink-lay {
+  0%   { opacity: 0; clip-path: inset(0 100% 0 0); }
+  12%  { opacity: 1; }
+  100% { opacity: 1; clip-path: inset(0 0 0 0); }
+}
+
+/* Block-level reveal for the reading — each section rises in sequence, only
+   after the user opts in. Delay set per element in JS via --reveal-delay.
+   The owner's rise-in feel: a longer, higher lift with a slow settle. */
+.reveal-block {
+  animation: block-rise 0.9s cubic-bezier(0.22, 1, 0.36, 1)
+             var(--reveal-delay, 0ms) both;
+}
+@keyframes block-rise {
+  0%   { opacity: 0; transform: translateY(26px); }
+  100% { opacity: 1; transform: translateY(0); }
+}
+
+/* ── Coin toss — three coins, thrown once per line ────────────────────
+   The tray holds a reserved height at all times (no layout shift). Each throw
+   the coins tumble (coin-spin), settle onto a face, then the stroke lays in. */
+.coin-tray {
+  display: flex;
+  justify-content: flex-start;
+  gap: 18px;
+  height: 56px;
+  margin-bottom: var(--sp-xl);
+  perspective: 600px;
+  transition: opacity 0.6s ease;
+}
+/* After the sixth throw the coins recede so the strokes are the sole hero. */
+.coin-tray--spent { opacity: 0.28; }
+
+.coin {
+  position: relative;
+  width: 44px;
+  height: 44px;
+  border-radius: 50%;
+  background: color-mix(in oklab, var(--card) 80%, var(--violet) 8%);
+  border: 1px solid color-mix(in oklab, var(--violet) 22%, transparent);
+  display: grid;
+  place-items: center;
+  backface-visibility: hidden;
+  will-change: transform;
+}
+/* The classic square hole at the coin's heart. */
+.coin__hole {
+  width: 12px;
+  height: 12px;
+  border-radius: 1px;
+  background: var(--background);
+  border: 1px solid color-mix(in oklab, var(--violet) 20%, transparent);
+}
+/* Heads (yang, value 3): lit from within with the one accent. Tails (yin,
+   value 2): a quiet ashen ring. Two distinct states — never colour alone,
+   the coins are decorative and every value is spoken by the live region. */
+.coin__face {
+  position: absolute;
+  inset: 4px;
+  border-radius: 50%;
+  border: 1px solid transparent;
+}
+.coin--heads {
+  border-color: color-mix(in oklab, var(--violet) 55%, transparent);
+  box-shadow: 0 0 12px -2px color-mix(in oklab, var(--violet) 45%, transparent);
+}
+.coin--heads .coin__face {
+  border-color: color-mix(in oklab, var(--violet) 60%, transparent);
+}
+.coin--heads .coin__hole { background: color-mix(in oklab, var(--violet) 42%, var(--background)); }
+.coin--tails { border-color: color-mix(in oklab, var(--ash) 28%, transparent); }
+
+/* The throw itself — the coin tumbles a few full turns and lifts, then lands.
+   Ends at rotateY(1080deg) ≡ front-facing and translateY(0): a crisp resting
+   state, no half-pixel. Staggered so the three don't land in lockstep. */
+.coin--spin { animation: coin-spin 620ms cubic-bezier(0.3, 0.7, 0.2, 1) both; }
+.coin--spin:nth-child(2) { animation-delay: 70ms; }
+.coin--spin:nth-child(3) { animation-delay: 140ms; }
+
+@keyframes coin-spin {
+  0%   { transform: translateY(0)     rotateY(0); }
+  55%  { transform: translateY(-18px) rotateY(620deg); }
+  100% { transform: translateY(0)     rotateY(1080deg); }
+}
+
+/* ── Cast progress — which line is next, in the product's voice ─────── */
+.cast-progress {
+  min-height: 1.2em;   /* reserve the line so it never shifts the layout */
+  margin-bottom: var(--sp-sm);
+  font-size: 0.7rem;
+  letter-spacing: 0.28em;
+  text-transform: uppercase;
+  color: var(--muted-foreground);
+}
+
+/* pulse-mark — a slow breath of the cinnabar→violet margin rule on changing
+   lines in the reading, so "what is changing" reads as quietly alive. Only
+   opacity moves; nothing blurs, nothing shifts layout. */
+@keyframes pulse-mark {
+  0%, 100% { opacity: 0.55; }
+  50%      { opacity: 1; }
+}
+
+/* Reduced motion: NO choreography anywhere. The result is present instantly,
+   fully unclipped and in place — motion must never gate content. The six
+   throws remain (that is interaction, not motion); only the coin tumble and
+   the ink wipe resolve instantly. */
+@media (prefers-reduced-motion: reduce) {
+  .line-row .yao__bar,
+  .reveal-block,
+  .changing-line::before,
+  .coin--spin {
+    animation: none !important;
+    clip-path: none !important;
+    opacity: 1 !important;
+    transform: none !important;
+  }
+  .coin-tray { transition: none !important; }
+}
+
+/* ── Cast actions (post-cast only; hidden guard handles pre-cast) ───── */
+
+.cast-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--sp-md);
+  margin-top: var(--sp-xl);
+}
+
+/* ── Reading page ──────────────────────────────────────────────────── */
+
+/* The reading is long-form: a single centred column with generous, symmetric
+   margins reads as intentional composition, not a doc nudged left. The giant
+   King Wen number is allowed to bleed past the right edge into the margin
+   (clipped only at the page edge by #app), so the transgression is SEEN. */
+.reading-page {
+  position: relative;
+  max-width: 760px;
+  margin: 0 auto;
+}
+
+/* The single, quiet way back — an action, not a navigation bar. */
+.reading-nav--bottom {
+  margin-top: var(--sp-3xl);
+  margin-bottom: 0;
+  padding-bottom: var(--sp-xl);
+}
+
+.reading-page > h1 {
+  font-size: 0.75rem;
+  color: var(--clr-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.28em;
+  font-weight: 600;
+  margin-bottom: var(--sp-md);
+}
+
+/* Reading epigraph — the framing sits at the top, before any conclusion. */
+.reading-epigraph {
+  font-family: var(--font-display);
+  font-style: italic;
+  font-size: 1.1875rem;
+  line-height: 1.7;
+  color: var(--clr-text);
+  max-width: 52ch;
+  padding-bottom: var(--sp-lg);
+  border-bottom: 1px solid transparent;
+  border-image-source: var(--hairline);
+  border-image-slice: 1;
+  margin-bottom: var(--sp-2xl);
+}
+
+/* The identity is the HERO — dramatic scale, with one transgression. */
+.hexagram-identity {
+  position: relative;
+  margin-bottom: var(--sp-xl);
+}
+
+/* Compositional transgression: the King Wen number at viewport scale,
+   bleeding off the RIGHT edge of the reading column into the margin and sitting
+   behind the glyph. Decorative (aria-hidden — the real number is in the names
+   row). Oversized and cropped: it makes the hexagram command the page. */
+.hexagram-bignum {
+  position: absolute;
+  right: clamp(-190px, -13vw, -70px);
+  top: 50%;
+  transform: translateY(-52%);
+  z-index: 0;
+  font-family: var(--font-display);
+  font-weight: 700;
+  font-size: clamp(150px, 26vw, 300px);
+  line-height: 1;
+  letter-spacing: -0.05em;
+  color: color-mix(in oklab, var(--violet) 55%, var(--foreground));
+  opacity: 0.1;
+  pointer-events: none;
+  user-select: none;
+  font-variant-numeric: lining-nums;
+}
+
+/* The Chinese glyph as art — the largest mark on the page (8–12:1 vs body). */
+.hexagram-zh {
+  position: relative;
+  z-index: 1;
+  display: block;
+  font-family: var(--font-cjk);
+  font-size: clamp(6rem, 22vw, 11.5rem);
+  line-height: 0.9;
+  color: var(--clr-text);
+  letter-spacing: -0.03em;
+  margin-bottom: var(--sp-md);
+}
+
+.hexagram-names-row {
+  position: relative;
+  z-index: 1;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: 0.35rem 1.1rem;
+  margin-bottom: var(--sp-xs);
+}
+.hexagram-number {
+  font-size: 0.6875rem;
+  text-transform: uppercase;
+  letter-spacing: 0.18em;
+  color: var(--clr-muted);
+  font-variant-numeric: tabular-nums;
+}
+.hexagram-pinyin {
+  font-family: var(--font-serif);
+  font-size: 1.5rem;
+  font-style: italic;
+  color: var(--clr-text);
+}
+.hexagram-en {
+  font-family: var(--font-serif);
+  font-size: 1.5rem;
+  color: var(--clr-text);
+}
+.hexagram-trigrams {
+  font-size: 0.8125rem;
+  color: var(--clr-muted);
+  letter-spacing: 0.03em;
+  margin-top: var(--sp-xs);
+}
+
+.judgment-text,
+.image-text {
+  font-family: var(--font-serif);
+  font-size: 1.0625rem;
+  line-height: 1.8;
+  color: var(--clr-text);
+  max-width: var(--measure);
+}
+
+/* ── Mini hexagram (reading view) ──────────────────────────────────── */
+
+.mini-hexagram {
+  display: flex;
+  flex-direction: column;
+  gap: var(--mini-slot-gap);
+  width: 100%;
+  max-width: 240px;
+  margin: var(--sp-lg) 0 var(--sp-xl);
+}
+.mini-slot {
+  height: var(--mini-slot-h);
+  display: flex;
+  align-items: center;
+}
+.yao--mini .yao__bar { height: var(--mini-bar-h); gap: var(--mini-gap); }
+.yao--mini .yao__ink { height: var(--mini-bar-h); }
+.yao--mini { gap: 8px; }
+
+/* ── Transformation diagram — primary becoming transformed ─────────── */
+
+.transformation-diagram {
+  display: flex;
+  align-items: center;
+  gap: var(--sp-xl);
+  margin: var(--sp-lg) 0 var(--sp-xl);
+  flex-wrap: wrap;
+}
+.transformation-hex {
+  display: flex;
+  flex-direction: column;
+  gap: var(--mini-slot-gap);
+  flex-shrink: 0;
+  width: 168px;
+}
+.transformation-label {
+  font-size: 0.625rem;
+  text-transform: uppercase;
+  letter-spacing: 0.18em;
+  color: var(--clr-muted);
+  margin-bottom: var(--sp-sm);
+}
+.transformation-arrow {
+  font-family: var(--font-serif);
+  font-size: 1.75rem;
+  color: var(--clr-muted);
+  flex-shrink: 0;
+  user-select: none;
+}
+
+/* ── Changing lines section ────────────────────────────────────────── */
+
+.changing-line {
+  position: relative;
+  padding-left: var(--sp-lg);
+  margin-bottom: var(--sp-xl);
+}
+/* A luminous violet margin rule — echoes the seal, marks what is changing, and
+   breathes slowly (opacity only) so "what is changing" reads as quietly alive. */
+.changing-line::before {
+  content: '';
+  position: absolute;
+  left: 0; top: 0.15em; bottom: 0.15em;
+  width: 3px;
+  background-color: var(--clr-accent);
+  border-radius: 1px;
+  box-shadow: 0 0 8px color-mix(in oklab, var(--violet) 60%, transparent);
+  animation: pulse-mark 2.4s ease-in-out infinite;
+}
+.changing-line-label {
+  font-size: 0.6875rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.16em;
+  color: var(--clr-accent);
+  margin-bottom: var(--sp-xs);
+}
+.changing-line-text {
+  font-family: var(--font-serif);
+  font-size: 1.0625rem;
+  line-height: 1.8;
+  color: var(--clr-text);
+  max-width: var(--measure);
+}
+.no-changing-note {
+  color: var(--clr-muted);
+  font-style: italic;
+  font-family: var(--font-serif);
+  font-size: 1.0625rem;
+  max-width: var(--measure);
+}
+
+.transformed-note {
+  color: var(--clr-muted);
+  font-size: 0.9375rem;
+  font-style: italic;
+  margin-bottom: var(--sp-md);
+  max-width: var(--measure);
+}
+
+.corpus-pending {
+  color: var(--clr-muted);
+  font-style: italic;
+  font-size: 0.875rem;
+}
+
+/* ── Disclaimer & dividers ─────────────────────────────────────────── */
+
+.disclaimer {
+  margin-top: var(--sp-2xl);
+  padding-top: var(--sp-lg);
+  border-top: 1px solid var(--clr-border);
+}
+.disclaimer p {
+  font-size: 0.8125rem;
+  color: var(--clr-muted);
+  line-height: 1.6;
+  max-width: var(--measure);
+  margin-bottom: 0;
+}
+
+.section-divider {
+  border: 0;
+  height: 1px;
+  background: var(--hairline);
+  margin: var(--sp-2xl) 0;
+}
+
+/* ── Responsive — excellent at 375px ───────────────────────────────── */
+
+@media (max-width: 560px) {
+  body { padding: var(--sp-2xl) var(--sp-lg) var(--sp-xl); }
+
+  :root {
+    --hero-bar-h: 22px;
+    --hero-bar-h-changing: 28px;  /* heavier changing stroke, fits the 30px slot */
+    --hero-gap: 18px;
+    --slot-h: 30px;
+    --slot-gap: 18px;
+  }
+
+  .cast-actions { flex-direction: column; }
+  .btn { width: 100%; min-width: 0; }
+
+  .transformation-diagram { flex-direction: column; align-items: flex-start; gap: var(--sp-md); }
+  .transformation-arrow { transform: rotate(90deg); margin-left: 60px; }
+}
+
+@media (min-width: 900px) {
+  body { padding: var(--sp-3xl) var(--sp-xl) var(--sp-2xl); }
+}
+
+/* ── History panel — past castings (secondary affordance) ──────────── */
+
+/* Left-rail container on desktop; full-width flow on mobile. */
+.casting-history { min-width: 0; }
+
+/* Separator above the panel — only rendered when content is present. */
+.history-panel {
+  padding-top: var(--sp-lg);
+  border-top: 1px solid transparent;
+  border-image-source: var(--hairline);
+  border-image-slice: 1;
+  margin-top: var(--sp-xl);
+}
+
+/* Heading inherits the global h2 scale — small, uppercase, muted. No extra margin. */
+.history-panel > h2 { margin-top: 0; }
+
+/* Quiet empty-state message — italic serif, muted, small. */
+.history-empty {
+  font-family: var(--font-serif);
+  font-style: italic;
+  font-size: 0.875rem;
+  color: var(--clr-muted);
+  margin-bottom: 0;
+}
+
+/* ── History list ───────────────────────────────── */
+
+.history-list {
+  list-style: none;
+  margin: 0 0 var(--sp-md);
+  padding: 0;
+}
+
+/* Each entry: open button on left + delete on right, separated by a hairline. */
+.history-item {
+  display: flex;
+  align-items: center;
+  border-bottom: 1px solid var(--clr-border);
+}
+.history-item:first-child { border-top: 1px solid var(--clr-border); }
+
+/* Open button — fills the row; borderless, transparent. */
+.history-item__open {
+  display: flex;
+  align-items: center;
+  gap: var(--sp-sm);
+  flex: 1;
+  min-width: 0;
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 0.55rem 0;
+  text-align: left;
+  color: var(--clr-text);
+  font-family: var(--font-sans);
+  border-radius: var(--radius);
+  transition: opacity 0.15s ease;
+}
+.history-item__open:hover { opacity: 0.72; }
+
+/* The Chinese character — a miniature design element beside each entry. */
+.history-item__zh {
+  font-family: var(--font-cjk);
+  font-size: 1.375rem;
+  line-height: 1;
+  color: var(--clr-text);
+  flex-shrink: 0;
+  width: 1.75rem;
+  text-align: center;
+}
+
+/* Name + time stacked vertically; truncates if the rail is narrow. */
+.history-item__text {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+  gap: 0.1rem;
+}
+.history-item__name {
+  font-size: 0.75rem;
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  color: var(--clr-text);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.history-item__time {
+  font-size: 0.625rem;
+  color: var(--clr-muted);
+  letter-spacing: 0.04em;
+}
+
+/* Delete button — minimal ghost, muted × glyph, keyboard-reachable. */
+.history-item__delete {
+  background: none;
+  border: none;
+  cursor: pointer;
+  color: var(--clr-muted);
+  font-size: 1rem;
+  line-height: 1;
+  padding: 0.55rem var(--sp-xs);
+  flex-shrink: 0;
+  border-radius: var(--radius);
+  transition: color 0.15s ease;
+}
+.history-item__delete:hover { color: var(--clr-text); }
+
+/* "Clear all" — reuses the btn--secondary style at a compact size. */
+.history-clear-btn {
+  font-size: 0.6875rem;
+  padding: 0.35rem 0.9rem;
+  min-width: 0;
+  letter-spacing: 0.12em;
+}
+
+/* Mobile: the history container needs breathing room above the first border. */
+@media (max-width: 899px) {
+  .casting-history { margin-top: var(--sp-xl); }
+  .history-panel { margin-top: 0; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .history-item__open,
+  .history-item__delete { transition: none; }
+}
+
+/* ── Save reading section (reading view) ──────────────────────────────────── */
+.reading-save {
+  text-align: center;
+  margin: var(--sp-xl) 0 0;
+}
+
+/* ── History entry question line ──────────────────────────────────────────── */
+/* Single line, clipped with ellipsis — full text lives in storage only. */
+.history-item__question {
+  display: block;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  font-size: var(--text-sm, 0.875rem);
+  color: var(--clr-muted);
+}
