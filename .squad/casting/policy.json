@@ -1,0 +1,6 @@
+{
+  "universeAllowlist": "default",
+  "oneUniversePerAssignment": true,
+  "teamSizeDefault": 5,
+  "exemptNames": ["Scribe", "Ralph", "Rai", "@copilot"]
+}

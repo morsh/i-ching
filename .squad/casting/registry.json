@@ -1,0 +1,12 @@
+{
+  "agents": [
+    { "persistent_name": "Niobe", "role": "Lead", "universe": "matrix", "created_at": "2026-07-29T10:00:49+03:00", "legacy_named": false, "status": "active" },
+    { "persistent_name": "Trinity", "role": "Frontend Dev", "universe": "matrix", "created_at": "2026-07-29T10:00:49+03:00", "legacy_named": false, "status": "active" },
+    { "persistent_name": "Switch", "role": "Engine Dev", "universe": "matrix", "created_at": "2026-07-29T10:00:49+03:00", "legacy_named": false, "status": "active" },
+    { "persistent_name": "Seraph", "role": "Content & Data", "universe": "matrix", "created_at": "2026-07-29T10:00:49+03:00", "legacy_named": false, "status": "active" },
+    { "persistent_name": "Tank", "role": "Tester", "universe": "matrix", "created_at": "2026-07-29T10:00:49+03:00", "legacy_named": false, "status": "active" },
+    { "persistent_name": "Scribe", "role": "Session Logger", "universe": "exempt", "created_at": "2026-07-29T10:00:49+03:00", "legacy_named": false, "status": "active" },
+    { "persistent_name": "Ralph", "role": "Work Monitor", "universe": "exempt", "created_at": "2026-07-29T10:00:49+03:00", "legacy_named": false, "status": "active" },
+    { "persistent_name": "Rai", "role": "RAI Reviewer", "universe": "exempt", "created_at": "2026-07-29T10:00:49+03:00", "legacy_named": false, "status": "active" }
+  ]
+}
