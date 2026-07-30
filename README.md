@@ -1,5 +1,7 @@
 # I-Ching Oracle
 
+**https://morsh.github.io/i-ching/**
+
 A static web page that casts an I-Ching hexagram using the traditional
 three-coin method, then offers to display the reading. Readings stay on your
 device if you choose to save them; nothing is ever transmitted.
@@ -52,7 +54,9 @@ lines (their values, coins, polarity, and changing flags), the primary and
 transformed hexagram references, a timestamp, and — if you typed a question —
 the question text, normalised and capped at 1000 characters. That is
 everything in the record. Storage key is `iching-oracle:history:v1`, newest
-first, capped at the 50 most recent entries.
+first, capped at the 50 most recent entries. The interface shows
+*"Saving will include your question."* next to the save button so you can see
+this at the point of decision.
 
 **Nothing ever leaves your device.** This guarantee is unconditional and holds
 whether or not you save. There are no network requests of any kind after the
@@ -79,7 +83,7 @@ persisted.
 ## Getting started
 
 ```bash
-cd i-ching-squad/app
+cd app
 npm install
 npm run dev       # local dev server (Vite)
 npm run build     # type-check then production bundle
@@ -90,16 +94,15 @@ npm test          # run the test suite (Vitest)
 
 ## Live site
 
-The production build is published to GitHub Pages at
-**https://morsh.github.io/mor-squads/**. Every push to the `prod` branch that
-touches `i-ching-squad/app/` triggers the `deploy-iching.yml` workflow: it
-runs `npm test` then `npm run build`, and deploys the resulting `dist/` folder.
-No manual steps are needed.
+The production build is published to **https://morsh.github.io/i-ching/** via
+GitHub Actions. Deploys are triggered by pushes to the `prod` branch (`main`
+is for development). The workflow runs tests and builds before deploying;
+refer to `.github/workflows/` for the current definition.
 
 ## Project layout
 
 ```
-i-ching-squad/
+(repo root)/
 ├── app/
 │   └── src/
 │       ├── types.ts          # shared TypeScript interfaces (Hexagram, Cast, …)

@@ -1,0 +1,7 @@
+# Union-merge for append-only squad state files so concurrent branches never
+# lose history entries when rebased or merged.
+.squad/decisions.md merge=union
+.squad/agents/*/history.md merge=union
+.squad/log/** merge=union
+.squad/orchestration-log/** merge=union
+.squad/rai/audit-trail.md merge=union
