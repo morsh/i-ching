@@ -176,6 +176,27 @@ function doThrows(n = 6): void {
 
 // ── Casting page — DOM structure ────────────────────────────────────────────
 
+describe('landing shell — static content and oracle mount coexist', () => {
+  it('keeps static landing content while the interactive oracle mounts into its child element', () => {
+    const shell = document.createElement('main');
+    shell.id = 'app';
+    const staticIntro = document.createElement('p');
+    staticIntro.textContent = 'STATIC_LANDING_COPY_SENTINEL';
+    const oracleMount = document.createElement('section');
+    oracleMount.id = 'oracle-app';
+    shell.appendChild(staticIntro);
+    shell.appendChild(oracleMount);
+    document.body.appendChild(shell);
+
+    renderCastingPage(oracleMount, vi.fn());
+
+    expect(shell.textContent).toContain('STATIC_LANDING_COPY_SENTINEL');
+    expect(oracleMount.querySelector('button')?.textContent).toContain('Toss the coins');
+
+    document.body.removeChild(shell);
+  });
+});
+
 describe('castingPage — 6 fixed slots (always in DOM)', () => {
   it('renders exactly 6 line-slot elements before any cast', () => {
     renderCastingPage(container, vi.fn());

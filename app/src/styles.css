@@ -1054,6 +1054,72 @@ p { margin-bottom: var(--sp-md); }
   .history-item__delete { transition: none; }
 }
 
+/* ── SEO prerender pages ───────────────────────────────────────────────────── */
+.seo-landing,
+.hexagram-article {
+  max-width: 880px;
+  margin: 0 auto;
+}
+
+.seo-landing__hero {
+  max-width: 760px;
+  margin-bottom: var(--sp-2xl);
+}
+
+.oracle-mount {
+  margin: var(--sp-2xl) 0 var(--sp-3xl);
+}
+
+.seo-section {
+  padding-top: var(--sp-xl);
+  margin-top: var(--sp-xl);
+  border-top: 1px solid transparent;
+  border-image-source: var(--hairline);
+  border-image-slice: 1;
+}
+
+.seo-section p,
+.hexagram-line p {
+  max-width: var(--measure);
+  color: var(--clr-text);
+}
+
+.hexagram-index {
+  columns: 2;
+  column-gap: var(--sp-2xl);
+  padding-left: 1.35rem;
+}
+
+.hexagram-index li {
+  break-inside: avoid;
+  margin-bottom: var(--sp-xs);
+}
+
+.hexagram-article > .hexagram-identity {
+  margin-top: var(--sp-xl);
+}
+
+.breadcrumb {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--sp-xs);
+  color: var(--clr-muted);
+  font-size: 0.8125rem;
+  letter-spacing: 0.05em;
+}
+
+.breadcrumb a {
+  color: var(--clr-muted);
+}
+
+.hexagram-line {
+  margin-bottom: var(--sp-lg);
+}
+
+@media (max-width: 560px) {
+  .hexagram-index { columns: 1; }
+}
+
 /* ── Save reading section (reading view) ──────────────────────────────────── */
 .reading-save {
   text-align: center;

@@ -4,18 +4,58 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <meta name="color-scheme" content="dark" />
-    <meta name="theme-color" content="#17121d" />
+    <meta name="theme-color" content="#12071f" />
     <link rel="icon" type="image/svg+xml" href="./favicon.svg" />
     <link rel="icon" type="image/png" sizes="32x32" href="./favicon-32x32.png" />
     <link rel="icon" type="image/png" sizes="16x16" href="./favicon-16x16.png" />
     <link rel="apple-touch-icon" sizes="180x180" href="./apple-touch-icon.png" />
     <link rel="manifest" href="./site.webmanifest" />
-    <title>I Ching Oracle</title>
+    <title>I Ching Oracle: Cast Coins for a Hexagram Reading</title>
+    <meta name="description" content="Ask a question, cast a traditional three-coin I Ching hexagram line by line, and read a private, reflective guide to changing lines and transformation." />
+    <meta name="robots" content="index,follow" />
+    <link rel="canonical" href="https://morsh.github.io/i-ching/" />
+    <meta property="og:type" content="website" />
+    <meta property="og:site_name" content="I Ching Oracle" />
+    <meta property="og:title" content="I Ching Oracle: Cast a Hexagram with Three Coins" />
+    <meta property="og:description" content="Ask a question, cast six I Ching lines from the bottom up, and read a reflective hexagram interpretation with changing lines." />
+    <meta property="og:url" content="https://morsh.github.io/i-ching/" />
+    <meta name="twitter:card" content="summary" />
+    <meta name="twitter:title" content="I Ching Oracle: Cast a Hexagram with Three Coins" />
+    <meta name="twitter:description" content="Cast the I Ching online using the traditional three-coin method, then read the primary hexagram, changing lines, and transformation." />
     <link rel="stylesheet" href="/src/styles.css" />
   </head>
   <body>
-    <main id="app"></main>
+    <main id="app">
+      <article class="seo-landing" aria-labelledby="landing-title">
+        <header class="seo-landing__hero">
+          <p class="hexagram-number">Three coins · Six lines · Private by design</p>
+          <h1 id="landing-title">I Ching Oracle</h1>
+        </header>
+
+        <section id="oracle-app" class="oracle-mount" aria-label="Interactive I Ching coin oracle"></section>
+
+        <section class="seo-section" aria-labelledby="coin-method-title">
+          <h2 id="coin-method-title">Cast a hexagram with the three-coin method</h2>
+          <p>This oracle uses the traditional three-coin method. You begin with a question or situation held clearly in mind, then cast six lines. Each line is made from three coins. Heads count as three, tails count as two; the total gives one of four line values: old yin, young yang, young yin, or old yang. Young lines are stable. Old lines are changing lines: yin may turn into yang, or yang may turn into yin.</p>
+          <p>A complete cast forms a hexagram: six broken or solid lines. The I Ching builds the hexagram from the ground upward, so this site throws the lines in the same order. The first throw becomes line 1, the bottom line. The sixth throw becomes line 6, the top line. The finished figure is read as a whole, but its order matters: the lower lines often suggest beginnings, foundations, or inward conditions, while the upper lines suggest development, culmination, or outward expression.</p>
+        </section>
+
+        <section class="seo-section" aria-labelledby="read-result-title">
+          <h2 id="read-result-title">How to read your I Ching result</h2>
+          <p>After the sixth throw, the reading names the primary hexagram and shows its Judgment and Image. If any lines are changing, their line texts are part of the reading too. Those changing lines also produce a transformed hexagram, showing the pattern that emerges when the old lines turn into their opposites. Read the primary hexagram first, then the changing lines, then the transformed hexagram as a direction of movement rather than a guaranteed outcome.</p>
+        </section>
+
+        <section class="seo-section" aria-labelledby="reflection-title">
+          <h2 id="reflection-title">A reflective tool, not a prediction</h2>
+          <p>The I Ching, or Book of Changes, is one of the oldest texts in the Chinese tradition: a book of images, judgments, and line statements used for reflection on change. It does not offer a prediction in the modern sense. A reading is better understood as a structured way to examine a question: what is forming, what is under strain, what is stable, and what may be changing.</p>
+        </section>
+
+        <section class="seo-section" aria-labelledby="privacy-title">
+          <h2 id="privacy-title">Privacy while you cast</h2>
+          <p>Your question is not transmitted. Nothing is stored unless you choose to save a reading locally; if you do choose to save, the saved reading includes the question so you can return to its context later.</p>
+        </section>
+      </article>
+    </main>
     <script type="module" src="/src/main.ts"></script>
   </body>
 </html>
-

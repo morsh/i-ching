@@ -11,12 +11,13 @@ import { renderCastingPage } from './ui/castingPage';
 import { renderReadingView } from './ui/readingView';
 
 /**
- * Bootstraps the app into the `#app` element.
+ * Bootstraps the app into the dedicated interactive mount.
+ * Static landing content in `#app` must survive hydration.
  */
 export function main(): void {
-  const container = document.getElementById('app');
+  const container = document.getElementById('oracle-app');
   if (!container) {
-    throw new Error('#app container not found');
+    throw new Error('#oracle-app container not found');
   }
   boot(container);
 }

@@ -8,3 +8,6 @@ Learned the favicon-specific font trap: an SVG used as a browser icon is not a n
 
 ## 2026-07-30 — 16px optical sizing
 The full 易 mark is beautiful at 180px and solid at 32px, but dishonest at 16px: the stroke count exceeds the pixel budget. The fix is not more antialiasing; it is a separate optical size. For the 16px PNG, dropped the ring, filled the tile, brightened the violet, and reduced the mark to the 日 component on whole pixels. Also hardened the generator so corrupt preview PNGs fail the run instead of becoming review artifacts.
+
+## 2026-07-30 — Vibrant strong shipped
+Promoted the strong vibrant 易 seal after comparison. Important catch: the first vibrant 16px versions were more colourful but less legible because the counters filled in. Final 16px keeps the original crisp 日 pixel geometry and only changes palette; richness at large sizes can come from gradients and glow, but favicon scale needs flat colour and open counters.

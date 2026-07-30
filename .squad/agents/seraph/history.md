@@ -30,3 +30,17 @@
 ## Cross-agent note — repo move path update — 2026-07-29T13:30:00+03:00
 
 Project now lives in standalone `morsh/i-ching`. App path is `app/` at repo root; do not use the old `i-ching-squad/app/` path.
+
+## SEO copy specification — 2026-07-30T10:35:00Z
+
+**Task:** Provide words-only SEO copy for the standalone I Ching site without touching application files.
+
+**Changes made:**
+
+1. Created `.squad/seo-copy.md` with the landing-page title, meta description, Open Graph and Twitter copy, share-image text direction, static landing-page prose, heading outline, per-hexagram page template, thin-content cautions, and search-led section recommendations.
+
+2. Created a decision inbox entry recording the SEO copy decision and the constraints preserved.
+
+3. Grounded the per-hexagram recommendation in the actual corpus: 64 entries, each with number, binary, Chinese name, pinyin, English name, lower/upper trigrams, Judgment, Image, and six line texts.
+
+**Learned:** SEO work for this project must not become keyword stuffing. The strongest search copy is explanatory: what the I Ching is, what the three-coin method does, why lines are cast bottom-to-top, and how changing lines are read. The per-hexagram pages can avoid thin-content risk only if they expose the unique corpus substance and add a real per-hexagram summary; a title/meta template alone is not enough.

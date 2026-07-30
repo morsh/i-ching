@@ -1,5 +1,5 @@
 import { chromium } from 'playwright';
-import { mkdirSync, readFileSync, statSync, writeFileSync } from 'fs';
+import { mkdirSync, readFileSync, statSync, writeFileSync, existsSync } from 'fs';
 import { dirname, join } from 'path';
 import { fileURLToPath } from 'url';
 
@@ -27,12 +27,9 @@ function assertPng(path, label) {
 }
 
 async function renderSvgPng(browser, size, file) {
-  const context = await browser.newContext({
-    viewport: { width: size, height: size },
-    deviceScaleFactor: 1,
-  });
+  const context = await browser.newContext({ viewport: { width: size, height: size }, deviceScaleFactor: 1 });
   const page = await context.newPage();
-  await page.setContent(`<!doctype html><html><head><style>html,body{margin:0;width:${size}px;height:${size}px;background:transparent;}img{display:block;width:${size}px;height:${size}px;}</style></head><body><img alt="" src="${svgDataUrl}"></body></html>`);
+  await page.setContent(`<!doctype html><html><head><style>html,body{margin:0;width:${size}px;height:${size}px;background:transparent;}img{display:block;width:${size}px;height:${size}px;}</style></head><body><img alt="" src="${svgDataUrl}"></body></html>`, { waitUntil: 'load' });
   const path = join(publicDir, file);
   await page.locator('img').screenshot({ path });
   await context.close();
@@ -49,21 +46,20 @@ async function renderHandTuned16(browser) {
     const ctx = canvas.getContext('2d');
     ctx.imageSmoothingEnabled = false;
 
-    ctx.fillStyle = '#17121d';
+    // Strong-vibrant optical size: same crisp 日 geometry as the muted shipped
+    // 16px icon, recolored only. No gradient or glow at tab size: counters stay open.
+    ctx.fillStyle = '#0b0511';
     ctx.fillRect(0, 0, 16, 16);
 
-    // Optical-size reduction of 易: the 日 component, drawn on whole pixels.
-    // The full glyph has too many strokes to resolve honestly at 16px.
-    ctx.fillStyle = '#f0cdff';
+    ctx.fillStyle = '#ffd2ff';
     ctx.fillRect(3, 2, 10, 2);  // top
     ctx.fillRect(3, 6, 10, 2);  // middle
     ctx.fillRect(3, 12, 10, 2); // bottom
     ctx.fillRect(3, 2, 2, 12);  // left
     ctx.fillRect(11, 2, 2, 12); // right
 
-    // One brighter pixel on the upper-right corner keeps the seal's violet light.
     ctx.fillStyle = '#ffffff';
-    ctx.globalAlpha = 0.55;
+    ctx.globalAlpha = 0.65;
     ctx.fillRect(12, 2, 1, 1);
 
     return canvas.toDataURL('image/png').split(',')[1];
@@ -81,11 +77,15 @@ try {
   await renderSvgPng(browser, 32, 'favicon-32x32.png');
   await renderSvgPng(browser, 180, 'apple-touch-icon.png');
 
-  const previewContext = await browser.newContext({ viewport: { width: 640, height: 330 }, deviceScaleFactor: 1 });
+  const previewContext = await browser.newContext({ viewport: { width: 720, height: 330 }, deviceScaleFactor: 1 });
   const preview = await previewContext.newPage();
   const icon16 = `data:image/png;base64,${readFileSync(join(publicDir, 'favicon-16x16.png')).toString('base64')}`;
   const icon32 = `data:image/png;base64,${readFileSync(join(publicDir, 'favicon-32x32.png')).toString('base64')}`;
   const icon180 = `data:image/png;base64,${readFileSync(join(publicDir, 'apple-touch-icon.png')).toString('base64')}`;
+  const baselinePath = join(screenshotsDir, 'icon-candidates', 'current-16.png');
+  const baseline16 = existsSync(baselinePath)
+    ? `data:image/png;base64,${readFileSync(baselinePath).toString('base64')}`
+    : icon16;
   await preview.setContent(`<!doctype html><html><head><style>
     body{margin:0;background:#2a2630;color:#eee;font:12px system-ui,sans-serif;}
     .sheet{display:grid;grid-template-columns:1fr 1fr;gap:0;padding:18px;}
@@ -97,8 +97,8 @@ try {
     img{display:block;box-shadow:0 0 0 1px rgba(127,90,180,.22);}
     .s16{width:16px;height:16px}.s32{width:32px;height:32px}.s180{width:180px;height:180px}.zoom{width:128px;height:128px;image-rendering:pixelated;image-rendering:crisp-edges;}
   </style></head><body><div class="sheet">
-    <section class="panel light"><strong>Light browser chrome</strong><div class="row"><div class="chip"><img class="s16" src="${icon16}"><span>16 actual</span></div><div class="chip"><img class="s32" src="${icon32}"><span>32</span></div><div class="chip"><img class="zoom" src="${icon16}"><span>16 ×8</span></div></div><div class="row"><div class="chip"><img class="s180" src="${icon180}"><span>180</span></div></div></section>
-    <section class="panel dark"><strong>Dark browser chrome</strong><div class="row"><div class="chip"><img class="s16" src="${icon16}"><span>16 actual</span></div><div class="chip"><img class="s32" src="${icon32}"><span>32</span></div><div class="chip"><img class="zoom" src="${icon16}"><span>16 ×8</span></div></div><div class="row"><div class="chip"><img class="s180" src="${icon180}"><span>180</span></div></div></section>
+    <section class="panel light"><strong>Light browser chrome</strong><div class="row"><div class="chip"><img class="s16" src="${icon16}"><span>16 actual</span></div><div class="chip"><img class="s32" src="${icon32}"><span>32</span></div><div class="chip"><img class="zoom" src="${baseline16}"><span>old 16 ×8</span></div><div class="chip"><img class="zoom" src="${icon16}"><span>new 16 ×8</span></div></div><div class="row"><div class="chip"><img class="s180" src="${icon180}"><span>180</span></div></div></section>
+    <section class="panel dark"><strong>Dark browser chrome</strong><div class="row"><div class="chip"><img class="s16" src="${icon16}"><span>16 actual</span></div><div class="chip"><img class="s32" src="${icon32}"><span>32</span></div><div class="chip"><img class="zoom" src="${baseline16}"><span>old 16 ×8</span></div><div class="chip"><img class="zoom" src="${icon16}"><span>new 16 ×8</span></div></div><div class="row"><div class="chip"><img class="s180" src="${icon180}"><span>180</span></div></div></section>
   </div></body></html>`, { waitUntil: 'load' });
   const previewPath = join(screenshotsDir, 'site-icon-preview.png');
   await preview.screenshot({ path: previewPath });
@@ -108,12 +108,11 @@ try {
   const svgTime = statSync(svgPath).mtimeMs;
   for (const file of ['favicon-16x16.png', 'favicon-32x32.png', 'apple-touch-icon.png']) {
     const pngPath = join(publicDir, file);
-    const pngTime = statSync(pngPath).mtimeMs;
-    if (pngTime <= svgTime) throw new Error(`${file} is not newer than favicon.svg`);
+    if (statSync(pngPath).mtimeMs <= svgTime) throw new Error(`${file} is not newer than favicon.svg`);
   }
   if (statSync(previewPath).mtimeMs <= svgTime) throw new Error('site-icon-preview.png is not newer than favicon.svg');
 
-  console.log('Generated hand-tuned favicon-16x16.png');
+  console.log('Generated strong-vibrant hand-tuned favicon-16x16.png');
   console.log('Generated favicon-32x32.png, apple-touch-icon.png from favicon.svg');
   console.log('Generated and validated screenshots/site-icon-preview.png');
 } finally {

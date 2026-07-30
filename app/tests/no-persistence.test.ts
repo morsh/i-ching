@@ -219,17 +219,28 @@ describe('privacy invariant — question text is never transmitted', () => {
 });
 
 // ---------------------------------------------------------------------------
-// No external URLs in index.html
+// No external resource URLs in index.html
 // ---------------------------------------------------------------------------
 
-describe('no external URLs in index.html', () => {
-  it('index.html contains no http:// or https:// URLs (no CDN, no analytics, no fonts)', () => {
+describe('no external resource URLs in index.html', () => {
+  it('index.html loads no external scripts, stylesheets, icons, fonts, or images', () => {
     const html = readFileSync(HTML_FILE, 'utf-8');
-    const matches = html.match(/https?:\/\/[^\s"'>]+/g) ?? [];
-    if (matches.length > 0) {
-      expect.fail(`External URLs found in index.html:\n${matches.join('\n')}`);
+
+    const violations: string[] = [];
+    const srcMatches = html.match(/\bsrc=["']https?:\/\/[^"']+["']/g) ?? [];
+    violations.push(...srcMatches);
+
+    const externalLinks = html.match(/<link\b[^>]*\bhref=["']https?:\/\/[^"']+["'][^>]*>/gi) ?? [];
+    for (const tag of externalLinks) {
+      if (!/\brel=["']canonical["']/i.test(tag)) {
+        violations.push(tag);
+      }
     }
-    expect(matches).toHaveLength(0);
+
+    if (violations.length > 0) {
+      expect.fail(`External resource URLs found in index.html:\n${violations.join('\n')}`);
+    }
+    expect(violations).toHaveLength(0);
   });
 });
 
