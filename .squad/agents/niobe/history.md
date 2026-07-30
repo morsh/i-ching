@@ -7,3 +7,7 @@
 - Kept `base: './'` as load-bearing for project Pages and required depth-aware relative asset paths such as `../../assets/...` on nested pages.
 - Chose permanent number-only hexagram URLs to avoid translation and romanisation churn without server redirects.
 - Recorded that the realistic SEO upside is long-tail growth over months, not near-term head-term dominance.
+
+## Cross-agent note — SEO prerender is live — 2026-07-30T11:15:00Z
+
+The SEO prerender pipeline is now live. The app has static pages at `/hexagram/<n>/`; future UI work must not assume the landing page is an empty shell.

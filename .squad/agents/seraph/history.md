@@ -44,3 +44,7 @@ Project now lives in standalone `morsh/i-ching`. App path is `app/` at repo root
 3. Grounded the per-hexagram recommendation in the actual corpus: 64 entries, each with number, binary, Chinese name, pinyin, English name, lower/upper trigrams, Judgment, Image, and six line texts.
 
 **Learned:** SEO work for this project must not become keyword stuffing. The strongest search copy is explanatory: what the I Ching is, what the three-coin method does, why lines are cast bottom-to-top, and how changing lines are read. The per-hexagram pages can avoid thin-content risk only if they expose the unique corpus substance and add a real per-hexagram summary; a title/meta template alone is not enough.
+
+## Cross-agent note — SEO prerender is live — 2026-07-30T11:15:00Z
+
+The SEO prerender pipeline is now live. The app has static pages at `/hexagram/<n>/`; future UI work must not assume the landing page is an empty shell.

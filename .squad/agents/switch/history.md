@@ -13,3 +13,7 @@ Workflow re-authored for morsh/i-ching. Actions bumped to Node 24 targets. Build
 ## Cross-agent note — repo move path update — 2026-07-29T13:30:00+03:00
 
 Project now lives in standalone `morsh/i-ching`. App path is `app/` at repo root; do not use the old `i-ching-squad/app/` path.
+
+## Cross-agent note — SEO prerender is live — 2026-07-30T11:15:00Z
+
+The SEO prerender pipeline is now live. The app has static pages at `/hexagram/<n>/`; future UI work must not assume the landing page is an empty shell.

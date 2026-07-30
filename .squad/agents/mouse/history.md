@@ -11,3 +11,7 @@ The full 易 mark is beautiful at 180px and solid at 32px, but dishonest at 16px
 
 ## 2026-07-30 — Vibrant strong shipped
 Promoted the strong vibrant 易 seal after comparison. Important catch: the first vibrant 16px versions were more colourful but less legible because the counters filled in. Final 16px keeps the original crisp 日 pixel geometry and only changes palette; richness at large sizes can come from gradients and glow, but favicon scale needs flat colour and open counters.
+
+## Cross-agent note — SEO prerender is live — 2026-07-30T11:15:00Z
+
+The SEO prerender pipeline is now live. The app has static pages at `/hexagram/<n>/`; future UI work must not assume the landing page is an empty shell.

@@ -372,3 +372,102 @@ Canonical decision ledger. Append-only. Merged from `decisions/inbox/` by Scribe
 **By:** Scribe
 **What:** Moved I-Ching Oracle from `i-ching-squad/` in `morsh/mor-squads` to standalone `morsh/i-ching`. The split used `git subtree split --prefix=i-ching-squad`, preserving the original three commits instead of squashing. The `.squad/` moved with the app, and `app/` is now at repo root.
 **Why:** The old Pages site and `prod` branch on `morsh/mor-squads` were deleted so `https://morsh.github.io/i-ching/` is the single canonical home.
+
+# Mouse — site icon
+
+## Final shipped choice
+Ship **Vibrant 易 — strong**. It keeps the character mark morsh already liked, increases perceived energy through a deeper violet field, brighter rim, and a violet-to-lavender glyph gradient, and stops short of the bold variant's halo-heavy mobile-game feeling.
+
+## Final files
+- `app/public/favicon.svg` — strong vibrant 易 seal, outline paths only.
+- `app/public/favicon-32x32.png` — rasterised from the strong SVG.
+- `app/public/apple-touch-icon.png` — rasterised from the strong SVG.
+- `app/public/favicon-16x16.png` — hand-tuned 16px optical-size PNG.
+- `app/public/site.webmanifest` — theme/background color updated to the strong field.
+- `app/scripts/generate-icons.mjs` — regenerates the shipped strong icon and validates PNG integrity.
+- `app/index.html` — theme-color updated to the strong field.
+
+## 16px optical-size decision
+The 16px favicon is not a downscale of the full 易 seal. At true tab size the full ideograph has too many strokes to resolve, especially after the rounded-square ring and padding consume the field. The dedicated `favicon-16x16.png` therefore uses the 日 component as a reduced mark: no border ring, edge-to-edge ink field, bright violet strokes, and whole-pixel rectangles. This is optical sizing, not a replacement of the primary mark — the 32px and 180px icons keep the full outlined 易 because they have enough pixels for the character to read.
+
+## Vibrancy versus legibility lesson
+The first vibrant exploration made the small mark more saturated but less legible: the 16px counters filled in, turning the clean outlined 日 into a blob with a floating bar. That is the reusable lesson: at favicon size, effects and denser colour can erase counters. The final 16px keeps the exact crisp counter geometry from the muted shipped mark and applies only the strong palette; no gradient or glow at 16px.
+
+## Rejected concepts
+- Coin: strongest non-易 candidate and conceptually honest to three-coin casting, but switching marks entirely is a larger brand move than the request.
+- Six lines: exact to the product at large size, but a literal six-line hexagram cannot remain itself at 16px; it must reduce to a trigram.
+- Taijitu: familiar and pleasant but generic, and not specifically an I Ching mark.
+- Vibrant bold: vivid but too neon/haloed; it risks dating as a mobile-game icon.
+- Vibrant modest: safe improvement, but the strong step better answers “more vibrant” while staying disciplined.
+
+## Why outlines matter for favicons
+SVG favicons are rendered as isolated images, and browser engines are inconsistent about honoring `@font-face` inside that context. If a live `<text>` glyph falls back on a system without CJK fonts, the tab can show a tofu box instead of 易. Outlines remove that failure mode and keep the mark deterministic.
+
+## Generator hardening
+`app/scripts/generate-icons.mjs` refuses corrupt image artifacts: it validates PNG signature bytes, minimum file size, and modification time newer than the source SVG. The preview sheet embeds PNG data URLs and includes old/new 16px magnification so the counter geometry can be checked directly.
+
+# Decision: SEO architecture — prerender static hexagram pages
+
+**Date:** 2026-07-30T10:35:00Z  
+**By:** Niobe  
+**Status:** Proposed for implementation by Switch
+
+## Context
+
+The deployed page is an empty JavaScript shell: the built root HTML is under 1 KB and contains `<main id="app"></main>`. The 64-hexagram corpus is substantial but only appears after runtime interaction, so crawlers see almost none of the project's real content.
+
+Constraints: GitHub Pages static hosting only; site served from `/i-ching/`; `app/vite.config.ts` `base: './'` must remain; deploy runs `npm ci`, `npm test`, then `npm run build` from `app/`; privacy promise forbids analytics/tracking/third-party scripts; engine must not import the corpus.
+
+## Decision
+
+Generate static, crawlable pages at build time:
+
+- Keep `base: './'`.
+- Add `app/scripts/prerender.mjs`, run after `vite build` in `npm run build`.
+- Use Vite's programmatic module loader to read `app/src/data/hexagrams.ts` from the script without adding a framework and without changing runtime module boundaries.
+- Emit `dist/hexagram/1/index.html` through `dist/hexagram/64/index.html` plus a crawlable `dist/index.html`, `dist/sitemap.xml`, and `dist/robots.txt`.
+- Canonical URL shape is number-only: `/i-ching/hexagram/<number>/`.
+- Hexagram article pages should not load the SPA script that replaces their body. They may link to the root casting experience. If enhanced later, enhancement must preserve the article content in the DOM.
+- Generated nested pages must rewrite asset references by depth: `../../assets/...` from `dist/hexagram/<n>/index.html`; never `/assets/...` and never a hardcoded domain-root asset path.
+
+## Rationale
+
+This is the highest-value SEO move because it exposes existing unique content to crawlers and long-tail searches. Number-only URLs avoid permanent translation/romanisation mistakes on a static host with no redirect layer. Depth-aware relative paths preserve the Pages subpath requirement and avoid the blank-site failure mode.
+
+## Consequences
+
+Switch should implement the generator and tests. Seraph owns final titles/descriptions/intro copy. The generated pages must be substantial enough to avoid thin-template risk: include judgment, image, six line texts, names, trigrams, and concise navigation. No analytics, doorway pages, keyword stuffing, or fake schema.
+
+# 2026-07-30T10:35:00Z: SEO copy specification
+
+**By:** Seraph
+
+**What:** Wrote the SEO copy specification for the landing page and possible per-hexagram pages. The spec includes a search-oriented but editorial page title, meta description, social sharing text, share-image copy direction, substantial crawler-visible landing-page prose, a single-h1 heading outline, a per-hexagram title/meta/heading template, thin-content safeguards, and question-led sections worth adding.
+
+**Why:** The deployed landing page currently exposes little useful static text to crawlers. Search performance should improve by giving humans and crawlers clear, respectful, specific language about the I Ching, three-coin casting, bottom-up line order, changing lines, and privacy without making predictive claims.
+
+**Constraints preserved:** Did not edit application source, markup, or build files. Privacy language keeps the two separate guarantees: the question is not transmitted, and nothing is stored unless the user chooses to save; if saved, the saved reading includes the question.
+
+### 2026-07-30T10:50:00Z: SEO prerender pipeline
+**By:** Switch
+**What:** Added `app/scripts/prerender.mjs` and wired `npm run build` to run `tsc --noEmit && vite build && node scripts/prerender.mjs`. The prerender step loads the TypeScript corpus through Vite SSR, rebuilds `dist/index.html`, emits `dist/hexagram/1/index.html` through `dist/hexagram/64/index.html`, writes `dist/sitemap.xml`, and emits a project-path `dist/robots.txt`.
+
+**Why:** The app shell was previously too small and text-empty for crawlers. The generated landing page now contains static copy, an index of all 64 hexagrams, metadata, and JSON-LD while the interactive oracle mounts into `#oracle-app` so hydration does not erase the static DOM. Each hexagram page is a static article with its own number, Chinese name, pinyin, English name, trigrams, Judgment, Image, all six line texts, canonical metadata, Open Graph/Twitter tags, and minimal `CreativeWork` JSON-LD.
+
+**Asset-path decision:** Kept `base: './'`. Generated document references go through a depth-aware helper: landing assets are `./assets/...`; nested hexagram pages use `../../assets/...`, `../../favicon.svg`, and `../../site.webmanifest`. Hexagram pages intentionally omit the SPA module script.
+
+**Robots decision:** Emitted `robots.txt` only as a completeness artifact with `User-agent` and `Allow`. Did not include a `Sitemap:` directive because project-path robots files are not authoritative for GitHub Pages host-root crawling; the sitemap should be submitted directly in Search Console.
+
+**Follow-up:** Once Seraph's `.squad/seo-copy.md` landed, wired its landing title, description, Open Graph/Twitter wording, static prose, and per-hexagram title/description/heading patterns into the generator without placeholder prose.
+
+**Verification:** `npm test` passed 161/161. `npm run build` passed. The generated `dist/index.html` grew from 888 bytes to 18,989 bytes. Verified 64 hexagram pages, 65 sitemap URLs, nested `../../assets/` references on a generated hexagram page, zero root-relative `src="/..."` or `href="/..."` references on that page, no surviving Seraph template placeholders, and fresh generated artifacts newer than changed sources.
+
+# Rai decision — SEO/static prerender pre-ship
+
+Date: 2026-07-30
+Reviewer: Rai
+Decision: 🟢 Green (ship)
+
+Reviewed built output first, including the landing page and sampled generated hexagram pages 1, 7, 18, 23, 44, 49, and 64, plus the SEO copy source, prerender generator, app shell, manifest, and privacy/casting storage flow.
+
+No blocking RAI issue found. The privacy copy is accurate, no third-party tracking or external request origin was introduced, divination framing stays reflective rather than predictive/advice-like, cultural references and sampled Chinese name/pinyin pairings are respectful and accurate for release, SEO structured data matches visible content, and the static content/accessibility checks pass.
