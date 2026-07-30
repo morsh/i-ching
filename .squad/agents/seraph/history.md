@@ -26,3 +26,7 @@
 - No other `i-ching-squad/` references remain in the README after these edits
 
 **Learned:** When a project moves repos, path references scatter across multiple sections — opening cd command, layout tree, deploy section, and any test/file references. Scan all of them before writing, not just the obvious ones. When a workflow file doesn't exist yet, describe only what you know from the coordinator (prod branch, tests before deploy) and defer the rest to the file itself — do not invent.
+
+## Cross-agent note — repo move path update — 2026-07-29T13:30:00+03:00
+
+Project now lives in standalone `morsh/i-ching`. App path is `app/` at repo root; do not use the old `i-ching-squad/app/` path.
